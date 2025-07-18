@@ -3,7 +3,7 @@ import type { CaseData, UQCValues, CQCValues } from '../mockData';
 import MediaPanel from './MediaPanel';
 import MetaPanel from './MetaPanel';
 import UQCForm, { isUQCComplete, scoreUQC } from './UQCForm';
-import CQCForm, { CATEGORY_OPTIONS, CQC_FIELDS, scoreCQC, type Category } from './CQCForm';
+import CQCForm, { CQC_FIELDS, scoreCQC, type Category } from './CQCForm';
 import AdditionalFeedback from './AdditionalFeedback';
 import SummaryPanel from './SummaryPanel';
 import ActionButtons from './ActionButtons';
@@ -116,11 +116,6 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
     setCqcValues({});
     setFeedback('');
     localStorage.removeItem(DRAFT_KEY);
-  };
-  const handleSaveDraft = () => {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({
-      uqc, primaryCategory, secondaryCategories, categoryFreeText, cqcValues, feedback
-    }));
   };
   const handleSubmit = async () => {
     setLoading(true);

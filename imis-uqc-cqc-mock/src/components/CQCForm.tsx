@@ -57,7 +57,7 @@ const CQC_FIELDS: Record<Category, { id: string; label: string; help?: string }[
   ],
 };
 
-function scoreCQC(category: string, answers: boolean[]): CQCRatingResult {
+function scoreCQC(_unused: string, answers: boolean[]): CQCRatingResult {
   const possible = answers.length;
   const score = answers.filter(Boolean).length;
   const pct = possible ? score / possible : 0;
