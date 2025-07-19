@@ -53,7 +53,6 @@ const CQC_FIELDS: Record<Category, { id: string; label: string; help?: string }[
   'Others': [
     { id: 'key_action', label: 'Key action present?' },
     { id: 'host_visible', label: 'Host visible?' },
-    { id: 'understandable', label: 'Action understandable w/o full context?' },
   ],
 };
 
@@ -70,45 +69,15 @@ function scoreCQC(_unused: string, answers: boolean[]): CQCRatingResult {
 const CQCForm: React.FC<{
   primaryCategory: Category | '';
   onPrimaryCategoryChange: (cat: Category | '') => void;
-  secondaryCategories: Category[];
-  onSecondaryCategoriesChange: (cats: Category[]) => void;
   cqcValues: CQCValues;
   onCqcChange: (v: CQCValues) => void;
   disabled?: boolean;
   categoryFreeText: string;
   onCategoryFreeTextChange: (s: string) => void;
-}> = ({ primaryCategory, onPrimaryCategoryChange, secondaryCategories, onSecondaryCategoriesChange, cqcValues, onCqcChange, disabled, categoryFreeText, onCategoryFreeTextChange }) => {
+}> = ({ primaryCategory, onPrimaryCategoryChange, cqcValues, onCqcChange, disabled, categoryFreeText, onCategoryFreeTextChange }) => {
   const fields = primaryCategory ? CQC_FIELDS[primaryCategory as Category] : [];
   const answers = fields.map(f => !!cqcValues[f.id]);
   const rating = fields.length ? scoreCQC(primaryCategory, answers) : null;
-
-  // Custom multi-select dropdown for secondary categories
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on outside click
-  React.useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClick);
-    } else {
-      document.removeEventListener('mousedown', handleClick);
-    }
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [dropdownOpen]);
-
-  const handleCheckbox = (cat: Category) => {
-    if (cat === primaryCategory) return;
-    if (secondaryCategories.includes(cat)) {
-      onSecondaryCategoriesChange(secondaryCategories.filter(c => c !== cat));
-    } else {
-      onSecondaryCategoriesChange([...secondaryCategories, cat]);
-    }
-  };
 
   return (
     <div className={`bg-white rounded-md shadow-sm p-4 mb-4 ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
@@ -142,53 +111,6 @@ const CQCForm: React.FC<{
             maxLength={12}
           />
         )}
-      </div>
-      {/* Secondary Category */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Secondary Category (optional, select best 2 overlapping categories)</label>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            className="w-full border rounded px-2 py-1 text-left bg-white focus:ring-2 focus:ring-blue-400"
-            onClick={() => setDropdownOpen(v => !v)}
-            disabled={disabled}
-            aria-haspopup="listbox"
-            aria-expanded={dropdownOpen}
-          >
-            {secondaryCategories.length === 0 ? (
-              <span className="text-gray-400">Select secondary categories...</span>
-            ) : (
-              <div className="flex flex-wrap gap-1">
-                {secondaryCategories.map(cat => (
-                  <span key={cat} className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs">{cat}</span>
-                ))}
-              </div>
-            )}
-          </button>
-          {dropdownOpen && (
-            <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow-lg max-h-48 overflow-auto">
-              {CATEGORY_OPTIONS.map(opt => {
-                const isSelected = secondaryCategories.includes(opt);
-                const atLimit = secondaryCategories.length >= 2 && !isSelected;
-                return (
-                  <label
-                    key={opt}
-                    className={`flex items-center px-3 py-2 cursor-pointer text-sm ${opt === primaryCategory ? 'text-gray-400 cursor-not-allowed' : ''} ${atLimit ? 'opacity-50' : ''}`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleCheckbox(opt)}
-                      disabled={opt === primaryCategory || disabled || atLimit}
-                      className="mr-2"
-                    />
-                    {opt}
-                  </label>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </div>
       {fields.length > 0 && (
         <div className="divide-y">

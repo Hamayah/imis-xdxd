@@ -46,17 +46,16 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
   const uqcRating = uqcComplete ? scoreUQC(uqc) : null;
 
   const [primaryCategory, setPrimaryCategory] = useState<Category | ''>('');
-  const [secondaryCategories, setSecondaryCategories] = useState<Category[]>([]);
   const [categoryFreeText, setCategoryFreeText] = useState('');
   const [cqcValues, setCqcValues] = useState<CQCValues>({});
   const [feedback, setFeedback] = useState('');
+  const [flagged, setFlagged] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Reset CQC values and secondary categories on primary change
+  // Reset CQC values on primary change
   const handlePrimaryCategoryChange = (cat: Category | '') => {
     setPrimaryCategory(cat);
     setCqcValues(getInitialCQCValues(cat));
-    setSecondaryCategories([]);
     if (cat !== 'Others') setCategoryFreeText('');
   };
 
@@ -68,10 +67,10 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
         const parsed = JSON.parse(draft);
         setUqc(parsed.uqc || initialUQC);
         setPrimaryCategory(parsed.primaryCategory || '');
-        setSecondaryCategories(parsed.secondaryCategories || []);
         setCategoryFreeText(parsed.categoryFreeText || '');
         setCqcValues(parsed.cqcValues || {});
         setFeedback(parsed.feedback || '');
+        setFlagged(parsed.flagged || false);
       } catch {}
     }
     // eslint-disable-next-line
@@ -86,7 +85,6 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
     room_id: caseData.room_id,
     extra_info: caseData.extra_info,
     primary_category: primaryCategory || '',
-    secondary_categories: secondaryCategories,
     category_free_text: primaryCategory === 'Others' ? categoryFreeText : '',
     uqc: {
       visual_clarity: uqc.v_clarity,
@@ -106,15 +104,16 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
     },
     overall_rating: overallRating,
     comments: feedback,
+    flagged: flagged,
   };
 
   const handleCancel = () => {
     setUqc(initialUQC);
     setPrimaryCategory('');
-    setSecondaryCategories([]);
     setCategoryFreeText('');
     setCqcValues({});
     setFeedback('');
+    setFlagged(false);
     localStorage.removeItem(DRAFT_KEY);
   };
   const handleSubmit = async () => {
@@ -129,7 +128,7 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
   const submitEnabled = uqcComplete && cqcValid;
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 grid grid-cols-1 md:grid-cols-[1fr_440px] gap-8">
+    <div className="max-w-7xl mx-auto py-8 px-4 grid grid-cols-1 md:grid-cols-[1fr_500px] gap-8">
       {/* Left: Metadata + Forms */}
       <div>
         <MetaPanel roomId={caseData.room_id} extraInfo={caseData.extra_info} />
@@ -137,15 +136,18 @@ const CaseEvaluationPage: React.FC<Props> = ({ caseData }) => {
         <CQCForm
           primaryCategory={primaryCategory}
           onPrimaryCategoryChange={handlePrimaryCategoryChange}
-          secondaryCategories={secondaryCategories}
-          onSecondaryCategoriesChange={setSecondaryCategories}
           cqcValues={cqcValues}
           onCqcChange={setCqcValues}
           disabled={!uqcComplete}
           categoryFreeText={categoryFreeText}
           onCategoryFreeTextChange={setCategoryFreeText}
         />
-        <AdditionalFeedback value={feedback} onChange={setFeedback} />
+        <AdditionalFeedback 
+          value={feedback} 
+          onChange={setFeedback} 
+          flagged={flagged}
+          onFlaggedChange={setFlagged}
+        />
         <SummaryPanel payload={submissionPayload} />
         {overallRating && (
           <div className="mb-2">

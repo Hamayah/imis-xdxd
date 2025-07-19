@@ -126,7 +126,7 @@ const UQCForm: React.FC<{
                 className="accent-red-500 focus:ring-2 focus:ring-red-400"
                 aria-describedby="uqc-ansa-desc"
               />
-              <span>Issue present</span>
+              <span>Yes</span>
             </label>
           </div>
           <div className="flex items-center gap-1">

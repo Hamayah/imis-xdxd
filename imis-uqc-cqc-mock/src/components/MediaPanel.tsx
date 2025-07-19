@@ -36,11 +36,12 @@ const MediaPanel: React.FC<MediaPanelProps> = ({ highlightUrl, highlightDuration
     <div className="flex flex-col md:flex-row gap-4">
       {/* Card 1: LLM Highlight */}
       <div className="bg-white rounded-md shadow-sm p-4 flex-1 min-w-0">
+        <div className="font-bold text-lg mb-2">LLM Highlight</div>
         <div
           className="rounded overflow-hidden mb-2 mx-auto"
           style={{
             width: '100%',
-            maxWidth: '100%',
+            maxWidth: '700px',
             aspectRatio: highlightAspect,
             background: '#000',
           }}
@@ -57,15 +58,16 @@ const MediaPanel: React.FC<MediaPanelProps> = ({ highlightUrl, highlightDuration
             onLoadedMetadata={handleHighlightMeta}
           />
         </div>
-        <div className="text-xs text-gray-500">LLM Highlight &middot; {formatDuration(highlightDuration)}</div>
+        <div className="text-xs text-gray-500">{formatDuration(highlightDuration)}</div>
       </div>
       {/* Card 2: Room Live Record */}
       <div className="bg-white rounded-md shadow-sm p-4 flex-1 min-w-0">
+        <div className="font-bold text-lg mb-2">Room Live Record</div>
         <div
           className="rounded overflow-hidden mb-2 mx-auto"
           style={{
             width: '100%',
-            maxWidth: '100%',
+            maxWidth: '700px',
             aspectRatio: fullAspect,
             background: '#000',
           }}
@@ -79,7 +81,7 @@ const MediaPanel: React.FC<MediaPanelProps> = ({ highlightUrl, highlightDuration
             onLoadedMetadata={handleFullMeta}
           />
         </div>
-        <div className="text-xs text-gray-500">Room Live Record &middot; {formatDuration(fullDuration)}</div>
+        <div className="text-xs text-gray-500">{formatDuration(fullDuration)}</div>
       </div>
     </div>
   );
