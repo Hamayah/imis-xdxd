@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import type { CQCValues, CQCRatingResult } from '../mockData';
 
 const CATEGORY_OPTIONS = [
